@@ -1,0 +1,20 @@
+name:                reduxer
+version:             0.1.0.0
+synopsis:            An interative beta reduction calculator for lambda calculus.
+-- description:         
+license:             BSD3
+license-file:        LICENSE
+author:              Paul H. Liu
+maintainer:          paul@thev.net
+-- copyright:           
+category:            Language
+build-type:          Simple
+-- extra-source-files:  
+cabal-version:       >=1.12
+
+executable reduxer
+    main-is:             CGI.hs
+    other-modules:       Lambda.Term, Lambda.Nav, Lambda.Show, Lambda.Read, Lambda.Parse, Lambda.Test, Lambda, DotGraph
+    hs-source-dirs:      src 
+    build-depends:       base, parsec, QuickCheck, mtl, xhtml, bytestring, process, cgi, utf8-string
+    default-language:    Haskell2010
