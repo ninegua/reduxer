@@ -1,6 +1,5 @@
 {-# LANGUAGE TupleSections #-}
 module Lambda.Strategy where
-import Prelude hiding (traverse)
 import Lambda.Term
 import Lambda.Read (paren, (&&&), mapP, sym)
 import Lambda.Nav
@@ -73,7 +72,7 @@ instance Redex LeftInnerRedex where
         where
           x@(Just _) `before` _ = x
           _ `before` y = y
-          afold f = traverse (\h (AExpr ns t) -> f ns t (h t))
+          afold f = ffix (\h (AExpr ns t) -> f ns t (h t))
           aux _ _ (Lam _ e) = e
           aux ns x (App f e) = f `before` e `before` if isRedex x then Just ns else Nothing
             where
@@ -102,7 +101,7 @@ instance Redex CBNRedex where
         where
           x@(Just _) `before` _ = x
           _ `before` y = y
-          afold f = traverse (\h (AExpr ns t) -> f ns t (h t))
+          afold f = ffix (\h (AExpr ns t) -> f ns t (h t))
           aux ns x (App f e) = (if isRedex x then Just ns else Nothing) `before`
                                f `before` e 
             where
@@ -131,7 +130,7 @@ instance Redex CBVRedex where
         where
           x@(Just _) `before` _ = x
           _ `before` y = y
-          afold f = traverse (\h (AExpr ns t) -> f ns t (h t))
+          afold f = ffix (\h (AExpr ns t) -> f ns t (h t))
           aux ns x (App f e) = f `before` e `before` if isRedex x then Just ns else Nothing
             where
               isRedex (App (AExpr _ (Lam _ _)) _) = True
@@ -148,7 +147,7 @@ standard p e = if null rs then Nothing else Just (reduce (head rs `asProxyTypeOf
 
 -- Return navigation paths to all possible redexes
 allRedexNavs :: Expr -> [Nav]
-allRedexNavs = map Nav . traverse (\h x -> aux x $ h $ unExpr x)
+allRedexNavs = map Nav . ffix (\h x -> aux x $ h $ unExpr x)
   where
     aux _ (Lam _ e) = map (D:) e
     aux x (App f e) = whenRedex x $ map (L:) f ++ map (R:) e

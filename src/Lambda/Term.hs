@@ -1,6 +1,5 @@
 {-# LANGUAGE TupleSections, DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
 module Lambda.Term where
-import Prelude hiding (traverse)
 import Data.List (delete, union, intersect)
 import Control.Applicative
 import Control.Monad ((>=>))
@@ -22,17 +21,17 @@ build :: (a -> Term a) -> a -> Expr
 build f = Expr . fmap (build f) . f 
 
 -- generalized traversal
--- traverse :: ((Term Expr -> Term a) -> Term Expr -> a) -> Expr -> a
-traverse :: Functor f => ((f a -> f b) -> a -> b) -> a -> b
-traverse f = f (fmap (traverse f)) 
+-- ffix :: ((Term Expr -> Term a) -> Term Expr -> a) -> Expr -> a
+ffix :: Functor f => ((f a -> f b) -> a -> b) -> a -> b
+ffix f = f (fmap (ffix f))
 
 -- the following are equivalent to fold and build
-fold'  f = traverse (\h -> f . h . unExpr)
-build' f = traverse (\h -> Expr . h . f)
+fold'  f = ffix (\h -> f . h . unExpr)
+build' f = ffix (\h -> Expr . h . f)
 {-
 foldWith, foldWith' :: (Expr -> Term a -> a) -> Expr -> a
 foldWith f e = f e $ fmap (foldWith f) $ unExpr e
-foldWith' f = traverse (\h e -> f e (h (unExpr e)))
+foldWith' f = ffix (\h e -> f e (h (unExpr e)))
 -}
 
 -- Monadic fold and build are not much more than a fold or build, with a 
@@ -66,7 +65,7 @@ boundVars' (Lam v s) = v : s
 boundVars' (App s t) = union s t
 
 subst :: Var -> Expr -> Expr -> Expr
-subst u w = traverse aux
+subst u w = ffix aux
   where
     aux h   (Expr (Var v))   | v == u = w
     aux h e@(Expr (Lam v _)) | v == u = e

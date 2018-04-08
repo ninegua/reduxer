@@ -1,6 +1,5 @@
 {-# Language FlexibleContexts, GeneralizedNewtypeDeriving #-}
 module Lambda.Nav where
-import Prelude hiding (traverse)
 import Lambda.Term
 import Lambda.Show
 import Data.Monoid
@@ -67,11 +66,11 @@ toNavAExpr e = runReader (fold (aux . dist) e) []
     aux e = AExpr <$> fmap (Nav . reverse) ask <*> e
 
 fromNavAExpr :: NavAExpr -> Expr
-fromNavAExpr = traverse (\h -> Expr . h . unAExpr)
+fromNavAExpr = ffix (\h -> Expr . h . unAExpr)
 
 -- test if toNavAExpr gives correct navigation path to sub trees
 propNavA :: Expr -> Bool
-propNavA e = traverse verify (toNavAExpr e)
+propNavA e = ffix verify (toNavAExpr e)
   where
     verify h a@(AExpr ns t) = fromNavAExpr a == fst (navigate ns e) && check (h t)
     check (Lam _ True) = True

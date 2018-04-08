@@ -1,7 +1,6 @@
 -- A CGI program for Lambda Calculator.
 {-# LANGUAGE GADTs, TupleSections #-}
 module Main where
-import Prelude hiding (traverse)
 import Lambda
 --import Lambda.Strategy
 import qualified Control.Exception as E 
@@ -47,7 +46,7 @@ clickableSpan ns s =
 toClickable :: (Nav->Html->Html) -> Expr -> Html
 toClickable decorate = snd . afold aux . toNavAExpr
   where
-    afold f = traverse (\h (AExpr ns t) -> f ns t (h t))
+    afold f = ffix (\h (AExpr ns t) -> f ns t (h t))
     aux ns _ (Var (V v)) = (either id id, decorate ns $ stringToHtml v)
     aux ns _ (Lam (V v) (_,e)) = (either pr pr, decorate ns $ "λ" +++ v +++ "." +++ e)
     aux ns t (App (b,f) (d,e)) = (either id pr, decorate ns $ b (Left f) +++ " " +++ d (Right e))
@@ -57,7 +56,7 @@ toClickable decorate = snd . afold aux . toNavAExpr
 toLines :: Redex r => (Nav -> Maybe r) -> Expr -> [String]
 toLines isRedex = draw . snd . afold aux . toNavAExpr
   where
-    afold f = traverse (\h (AExpr ns t) -> f ns t (h t))
+    afold f = ffix (\h (AExpr ns t) -> f ns t (h t))
     aux ns _ (Var (V v)) = (either id id, sp (length v))
     aux ns _ (Lam (V v) (_,e)) = (either pr pr, sp (length v + 2) ++ e)
     aux ns t (App (b,f) (d,e)) = (either id pr, incRedex s)
