@@ -3,12 +3,10 @@
   overrides = self: super: {
     cgi = pkgs.haskell.lib.doJailbreak super.cgi;
   };
-  #source-overrides = { 
-  #  cgi = pkgs.fetchFromGitHub {
-  #    owner = "cheecheeo";
-  #    repo = "haskell-cgi";
-  #    rev = "e1387d6c49c71d483946257b506e27c5dfab8189";
-  #    sha256 = "17ky4qdc8sqsnr1yq4gcbjn3wai6wbv2kbisr7j8v4bg68r5rp2a";
-  #  };
-  #};
+  modifier = drv : pkgs.haskell.lib.appendConfigureFlag (pkgs.haskell.lib.justStaticExecutables drv) ''
+    --ghc-option=-optl=-static
+    --ghc-option=-optl=-L${pkgs.gmp6.override { withStatic = true; }}/lib
+    --ghc-option=-optl=-L${pkgs.zlib.static}/lib
+    --ghc-option=-optl=-L${pkgs.glibc.static}/lib
+  '';
 }
