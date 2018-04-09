@@ -1,4 +1,4 @@
-# An interative beta reduction calculator for lambda calculus
+# An interactive beta reduction calculator for lambda calculus
 
 [Live demo](http://projectultimatum.org/cgi-bin/lambda)
 
