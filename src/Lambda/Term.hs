@@ -21,7 +21,7 @@ build :: (a -> Term a) -> a -> Expr
 build f = Expr . fmap (build f) . f 
 
 -- generalized traversal
--- ffix :: ((Term Expr -> Term a) -> Term Expr -> a) -> Expr -> a
+-- ffix :: ((Term Expr -> Term a) -> Expr -> a) -> Expr -> a
 ffix :: Functor f => ((f a -> f b) -> a -> b) -> a -> b
 ffix f = f (fmap (ffix f))
 
