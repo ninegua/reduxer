@@ -8,7 +8,7 @@ import Control.Applicative
 
 -- how to navigate a lambda AST.
 data Dir = U | D | L | R deriving (Eq, Show, Enum)
-newtype Nav = Nav [Dir] deriving (Eq, Monoid)
+newtype Nav = Nav [Dir] deriving (Eq, Semigroup, Monoid)
 type Zipper = (Expr, [Expr -> Expr])
 
 instance Show Nav where

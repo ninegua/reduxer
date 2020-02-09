@@ -89,7 +89,7 @@ toPNG err e = do
       handler :: E.SomeException -> IO B.ByteString
       handler e = err "Broken Pipe: perhaps your path to dot is wrong?\n" >> return B.empty
   -- Use dot to layout nodes, use neato to draw edges
-  (inp, out, _, proc) <- runInteractiveCommand ("export PATH=/usr/local/bin:/opt/local/bin:$PATH;dot|neato -n1 -Gsplines=true -Tpng")
+  (inp, out, _, proc) <- runInteractiveCommand ("export PATH=/run/current-system/sw/bin:$PATH;dot|neato -n1 -Gsplines=true -Tpng")
   s <- E.catch (do
          B.hPutStrLn inp (BU.fromString input)
          B.hPutStrLn inp B.empty
