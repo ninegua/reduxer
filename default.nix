@@ -1,9 +1,9 @@
-{ pkgs ? import <nixpkgs> {} }: pkgs.haskell.packages.ghc882.developPackage {
+{ pkgs ? import <nixpkgs> {} }: pkgs.haskellPackages.developPackage {
   root = ./.; 
   overrides = self: super: {
     cgi = self.callPackage (
         { mkDerivation, base, bytestring, containers, doctest, exceptions
-        , mtl, multipart, network, network-uri, parsec, QuickCheck, time, xhtml, stdenv
+        , mtl, multipart, network, network-uri, parsec, QuickCheck, time, xhtml, lib
         }:
         mkDerivation {
           pname = "cgi";
@@ -16,18 +16,18 @@
           testHaskellDepends = [ base doctest QuickCheck ];
           homepage = "https://github.com/cheecheeo/haskell-cgi";
           description = "A library for writing CGI programs";
-          license = stdenv.lib.licenses.bsd3;
-          configureFlags = "--flags -network-uri";
+          license = lib.licenses.bsd3;
+          configureFlags = [ "--flags" "-network-uri"];
         }) {};
 
-    multipart = self.callPackage ({ mkDerivation, base, bytestring, parsec, stringsearch, stdenv }:
+    multipart = self.callPackage ({ mkDerivation, base, bytestring, parsec, stringsearch, lib }:
      mkDerivation {
        pname = "multipart";
        version = "0.2.0";
        sha256 = "1rw668hxj04zpkfwhjqbd0ph0wy9k2khsrbsni9sxi2px49vnmym";
        libraryHaskellDepends = [ base bytestring parsec stringsearch ];
        description = "HTTP multipart split out of the cgi package";
-       license = stdenv.lib.licenses.bsd3;
+       license = lib.licenses.bsd3;
      }) {};
   };
   modifier = drv : pkgs.haskell.lib.appendConfigureFlag (pkgs.haskell.lib.justStaticExecutables drv) ''
